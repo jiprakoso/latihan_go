@@ -1,4 +1,4 @@
-module fullstack-api-blog
+module github.com/jiprakoso/latihan_go
 
 go 1.16
 
@@ -9,4 +9,5 @@ require (
 	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/joho/godotenv v1.3.0 // indirect
 	golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
 )
