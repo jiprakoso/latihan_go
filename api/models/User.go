@@ -22,17 +22,17 @@ type User struct {
 	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP" json:"updated_at"`
 }
 
-//Hash untuk generate password menjadi HASH
+// Hash untuk generate password menjadi HASH
 func Hash(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 
-// VerifiPassword untuk mengkomapare password dengan hash dengan password
+// VerifiPassword fungsi untuk mengkomapare password dengan hash dengan password
 func VerifiPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-// BeforeSave untuk cek
+// BeforeSave fungsi untuk cek password
 func (u *User) BeforeSave() error {
 	hashedPassword, err := Hash(u.Password)
 	if err != nil {
@@ -42,7 +42,7 @@ func (u *User) BeforeSave() error {
 	return nil
 }
 
-//Prepare method kolom User
+// Prepare public method kolom User
 func (u *User) Prepare() {
 	u.ID = 0
 	u.Nickname = html.EscapeString(strings.TrimSpace(u.Nickname))
@@ -51,7 +51,7 @@ func (u *User) Prepare() {
 	u.UpdatedAt = time.Now()
 }
 
-//Validate data user, semua data di casting menjadi huruf lowercase
+//Validate public data user, semua data di casting menjadi huruf lowercase
 func (u *User) Validate(action string) error {
 	switch strings.ToLower(action) {
 	case "update":
@@ -98,7 +98,7 @@ func (u *User) Validate(action string) error {
 	}
 }
 
-// SaveUser method
+// SaveUser public method
 func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 	var err error
 	err = db.Debug().Create(&u).Error
@@ -108,7 +108,7 @@ func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 	return u, nil
 }
 
-// FindAllUser method cari data user
+// FindAllUser public method cari data user
 func (u *User) FindAllUser(db *gorm.DB) (*[]User, error) {
 	var err error
 	users := []User{}
@@ -119,7 +119,7 @@ func (u *User) FindAllUser(db *gorm.DB) (*[]User, error) {
 	return &users, err
 }
 
-// FindUserByID method, cari user berdasarkan ID
+// FindUserByID public method, cari user berdasarkan ID
 func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
 	var err error
 	err = db.Debug().Model(User{}).Where("Id = ?", uid).Take(&u).Error
@@ -132,7 +132,7 @@ func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
 	return u, err
 }
 
-//UpdateAUser method, update data user
+//UpdateAUser public method, update data user
 func (u *User) UpdateAUser(db *gorm.DB, uid uint32) (*User, error) {
 
 	//To hash the password
@@ -152,10 +152,20 @@ func (u *User) UpdateAUser(db *gorm.DB, uid uint32) (*User, error) {
 	if db.Error != nil {
 		return &User{}, db.Error
 	}
-	// This is the display the updated user
+
+	// menampilkan data user yang terupdate
 	err = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&u).Error
 	if err != nil {
 		return &User{}, err
 	}
 	return u, nil
+}
+
+// DeleteAUser public method untuk hapus user
+func (u *User) DeleteAUser(db *gorm.DB, uid uint32) (int64, error) {
+	db = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&User{}).Delete(&User{})
+	if db.Error != nil {
+		return 0, db.Error
+	}
+	return db.RowsAffected, nil
 }
