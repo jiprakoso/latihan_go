@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"html"
+	"log"
 	"strings"
 	"time"
 
@@ -101,6 +102,58 @@ func (u *User) Validate(action string) error {
 func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 	var err error
 	err = db.Debug().Create(&u).Error
+	if err != nil {
+		return &User{}, err
+	}
+	return u, nil
+}
+
+// FindAllUser method cari data user
+func (u *User) FindAllUser(db *gorm.DB) (*[]User, error) {
+	var err error
+	users := []User{}
+	err = db.Debug().Model(&User{}).Limit(100).Find(&users).Error
+	if err != nil {
+		return &[]User{}, err
+	}
+	return &users, err
+}
+
+// FindUserByID method, cari user berdasarkan ID
+func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
+	var err error
+	err = db.Debug().Model(User{}).Where("Id = ?", uid).Take(&u).Error
+	if err != nil {
+		return &User{}, err
+	}
+	if gorm.IsRecordNotFoundError(err) {
+		return &User{}, errors.New("User Not Found")
+	}
+	return u, err
+}
+
+//UpdateAUser method, update data user
+func (u *User) UpdateAUser(db *gorm.DB, uid uint32) (*User, error) {
+
+	//To hash the password
+	err := u.BeforeSave()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&User{}).UpdateColumns(
+		map[string]interface{}{
+			"password":  u.Password,
+			"nickname":  u.Nickname,
+			"email":     u.Email,
+			"update_at": time.Now(),
+		},
+	)
+	if db.Error != nil {
+		return &User{}, db.Error
+	}
+	// This is the display the updated user
+	err = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&u).Error
 	if err != nil {
 		return &User{}, err
 	}
