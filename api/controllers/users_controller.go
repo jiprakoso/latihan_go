@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/jiprakoso/latihan_go/api/models"
 	"github.com/jiprakoso/latihan_go/api/responses"
 	"github.com/jiprakoso/latihan_go/api/utils/formaterror"
@@ -41,8 +43,8 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, userCreated)
 }
 
-//GetUser public method, untuk mendapatkan data user dari database
-func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
+//GetUsers public method, untuk mendapatkan semua data user dari database
+func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	users, err := user.FindAllUser(server.DB)
 	if err != nil {
@@ -50,4 +52,21 @@ func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.JSON(w, http.StatusOK, users)
+}
+
+//GetUser public method, untuk mendapatkan data user dari database berdasarkan  by ID
+func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	uid, err := strconv.ParseUint(vars["id"], 10, 32)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	user := models.User{}
+	userGotten, err := user.FindUserByID(server.DB, uint32(uid))
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, userGotten)
 }
