@@ -2,11 +2,13 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
 	"github.com/jiprakoso/latihan_go/api/models"
 	"github.com/jiprakoso/latihan_go/api/responses"
+	"github.com/jiprakoso/latihan_go/api/utils/formaterror"
 )
 
 //CreateUser public method
@@ -27,9 +29,25 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
 		return
 	}
-	userCreate, err := user.SaveUser(server.DB)
+	userCreated, err := user.SaveUser(server.DB)
 
 	if err != nil {
 		formattedError := formaterror.FormatError(err.Error())
+		responses.ERROR(w, http.StatusInternalServerError, formattedError)
+		return
 	}
+
+	w.Header().Set("Location", fmt.Sprintf("%s%s /%d", r.Host, r.RequestURI, userCreated.ID))
+	responses.JSON(w, http.StatusCreated, userCreated)
+}
+
+//GetUser public method, untuk mendapatkan data user dari database
+func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
+	user := models.User{}
+	users, err := user.FindAllUser(server.DB)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+	responses.JSON(w, http.StatusOK, users)
 }
