@@ -61,7 +61,7 @@ func (p *Post) SavePost(db *gorm.DB) (*Post, error) {
 }
 
 //FindAllPost pucblic method, menampilkan seluruh data post yang ada di database
-func (p *Post) FindAllPost(db *gorm.DB, pid uint64) (*[]Post, error) {
+func (p *Post) FindAllPosts(db *gorm.DB) (*[]Post, error) {
 	var err error
 	posts := []Post{}
 	err = db.Debug().Model(&Post{}).Limit(100).Find(&posts).Error
@@ -79,7 +79,7 @@ func (p *Post) FindAllPost(db *gorm.DB, pid uint64) (*[]Post, error) {
 	return &posts, nil
 }
 
-//FindPostByID public method, cari data post by ID
+//FindPostByID public method, cari data post by ID model
 func (p *Post) FindPostByID(db *gorm.DB, pid uint64) (*Post, error) {
 	var err error
 	err = db.Debug().Model(&Post{}).Where("id = ?", pid).Take(&p).Error
@@ -95,7 +95,7 @@ func (p *Post) FindPostByID(db *gorm.DB, pid uint64) (*Post, error) {
 	return p, nil
 }
 
-//UpdateAPost public method, update data Post
+//UpdateAPost public method, update data Post model
 func (p *Post) UpdateAPost(db *gorm.DB) (*Post, error) {
 
 	var err error
@@ -113,7 +113,7 @@ func (p *Post) UpdateAPost(db *gorm.DB) (*Post, error) {
 	return p, nil
 }
 
-//DeleteAPost public method, hapus data post
+//DeleteAPost public method, hapus data post model
 func (p *Post) DeleteAPost(db *gorm.DB, pid uint64, uid uint32) (int64, error) {
 
 	db = db.Debug().Model(&Post{}).Where("id = ? and author_id = ?", pid, uid).Take(&Post{}).Delete(&Post{})
