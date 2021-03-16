@@ -7,13 +7,14 @@ import (
 
 	"github.com/jiprakoso/latihan_go/api/controllers"
 	"github.com/jiprakoso/latihan_go/api/seed"
+	"github.com/joho/godotenv"
 )
 
 var server = controllers.Server{}
 
 func Run() {
 	var err error
-	err = gotoenv.Load()
+	err = godotenv.Load()
 	if err != nil {
 		log.Fatal("Error getting env, not comming through %v", err)
 	} else {
