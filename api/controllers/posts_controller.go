@@ -15,6 +15,7 @@ import (
 	"github.com/jiprakoso/latihan_go/api/utils/formaterror"
 )
 
+// CreatePost public method, post controller
 func (server *Server) CreatePost(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -52,6 +53,7 @@ func (server *Server) CreatePost(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, postCreated)
 }
 
+// GetPosts public method, post controller
 func (server *Server) GetPosts(w http.ResponseWriter, r *http.Request) {
 	post := models.Post{}
 
@@ -63,6 +65,7 @@ func (server *Server) GetPosts(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusOK, posts)
 }
 
+// UpdatePost public method, post controller
 func (server *Server) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -132,4 +135,46 @@ func (server *Server) UpdatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.JSON(w, http.StatusOK, postUpdated)
+}
+
+// DeletePost public method, post controller
+func (server *Server) DeletePost(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	// is valid poast id given us to us?
+	pid, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	//is user authenticated?
+	uid, err := auth.ExtractTokenID(r)
+	if err != nil {
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		return
+	}
+
+	//check if post exist
+	post := models.Post{}
+	err = server.DB.Debug().Model(models.Post{}).Where("id = ?", pid).Take(&post).Error
+	if err != nil {
+		responses.ERROR(w, http.StatusNotFound, errors.New("Unauthorized"))
+		return
+	}
+
+	//is the authenticated user, the owner this post?
+	if uid != post.AuthorID {
+		responses.ERROR(w, http.StatusNotFound, errors.New("Unauthorized"))
+		return
+	}
+
+	_, err = post.DeleteAPost(server.DB, pid, uid)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	w.Header().Set("Entity", fmt.Sprintf("%d", pid))
+	responses.JSON(w, http.StatusNoContent, "")
 }
