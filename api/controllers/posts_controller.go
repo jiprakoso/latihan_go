@@ -53,7 +53,7 @@ func (server *Server) CreatePost(w http.ResponseWriter, r *http.Request) {
 	responses.JSON(w, http.StatusCreated, postCreated)
 }
 
-// GetPosts public method, post controller
+// GetPosts public method GET ALL POST, post controller
 func (server *Server) GetPosts(w http.ResponseWriter, r *http.Request) {
 	post := models.Post{}
 
@@ -63,6 +63,25 @@ func (server *Server) GetPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	responses.JSON(w, http.StatusOK, posts)
+}
+
+// GetPost public method find by ID, post controller
+func (server *Server) GetPost(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	pid, err := strconv.ParseUint(vars["id"], 10, 64)
+	if err != nil {
+		responses.ERROR(w, http.StatusBadRequest, err)
+		return
+	}
+
+	post := models.Post{}
+	postReceived, err := post.FindPostByID(server.DB, pid)
+	if err != nil {
+		responses.ERROR(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, postReceived)
 }
 
 // UpdatePost public method, post controller
