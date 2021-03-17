@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -99,6 +100,7 @@ func (server *Server) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	uid, err := auth.ExtractTokenID(r)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		log.Printf("Unauthorized 1")
 		return
 	}
 
@@ -113,6 +115,7 @@ func (server *Server) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	// if a user attempt to update a post not belonging to him
 	if uid != post.AuthorID {
 		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		log.Printf("Unauthorized 2")
 		return
 	}
 
@@ -134,6 +137,7 @@ func (server *Server) UpdatePost(w http.ResponseWriter, r *http.Request) {
 	///Also check if the request user id is equal to the one gotten from token
 	if uid != postUpdate.AuthorID {
 		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
+		log.Printf("Unauthorized 3")
 		return
 	}
 
@@ -178,7 +182,7 @@ func (server *Server) DeletePost(w http.ResponseWriter, r *http.Request) {
 	post := models.Post{}
 	err = server.DB.Debug().Model(models.Post{}).Where("id = ?", pid).Take(&post).Error
 	if err != nil {
-		responses.ERROR(w, http.StatusNotFound, errors.New("Unauthorized"))
+		responses.ERROR(w, http.StatusNotFound, errors.New("pos not found"))
 		return
 	}
 
