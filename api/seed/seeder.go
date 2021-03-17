@@ -14,11 +14,6 @@ var users = []models.User{
 		Password: "password",
 	},
 	models.User{
-		Nickname: "Martin Luther",
-		Email:    "luther@gmail.com",
-		Password: "password",
-	},
-	models.User{
 		Nickname: "Aji Prakoso",
 		Email:    "ajiprakoso14@gmail.com",
 		Password: "password",
@@ -37,17 +32,19 @@ var posts = []models.Post{
 }
 
 func Load(db *gorm.DB) {
+
 	err := db.Debug().DropTableIfExists(&models.Post{}, &models.User{}).Error
 	if err != nil {
-		log.Fatalf("cannot drop table : %v", err)
+		log.Fatalf("cannot drop table: %v", err)
 	}
 	err = db.Debug().AutoMigrate(&models.User{}, &models.Post{}).Error
 	if err != nil {
-		log.Fatalf("cannot migrate table : %v", err)
+		log.Fatalf("cannot migrate table: %v", err)
 	}
+
 	err = db.Debug().Model(&models.Post{}).AddForeignKey("author_id", "users(id)", "cascade", "cascade").Error
 	if err != nil {
-		log.Fatalf("attaching foreign key error : %v", err)
+		log.Fatalf("attaching foreign key error: %v", err)
 	}
 
 	for i, _ := range users {
@@ -62,5 +59,4 @@ func Load(db *gorm.DB) {
 			log.Fatalf("cannot seed posts table: %v", err)
 		}
 	}
-
 }
