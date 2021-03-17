@@ -53,9 +53,9 @@ func (server *Server) SignIn(email, password string) (string, error) {
 		return "", err
 	}
 
-	err = models.VerifiPassword(user.Password, password)
+	err = models.VerifyPassword(user.Password, password)
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		return "", err
 	}
-	return auth.CreateToke(user.ID)
+	return auth.CreateToken(user.ID)
 }

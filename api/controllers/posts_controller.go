@@ -184,7 +184,7 @@ func (server *Server) DeletePost(w http.ResponseWriter, r *http.Request) {
 
 	//is the authenticated user, the owner this post?
 	if uid != post.AuthorID {
-		responses.ERROR(w, http.StatusNotFound, errors.New("Unauthorized"))
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
 

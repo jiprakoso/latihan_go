@@ -41,14 +41,14 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Location", fmt.Sprintf("%s%s /%d", r.Host, r.RequestURI, userCreated.ID))
+	w.Header().Set("Location", fmt.Sprintf("%s%s/%d", r.Host, r.RequestURI, userCreated.ID))
 	responses.JSON(w, http.StatusCreated, userCreated)
 }
 
 //GetUsers public method, controller untuk mendapatkan semua data user dari database
 func (server *Server) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
-	users, err := user.FindAllUser(server.DB)
+	users, err := user.FindAllUsers(server.DB)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
 		return
@@ -124,6 +124,7 @@ func (server *Server) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	uid, err := strconv.ParseUint(vars["id"], 10, 32)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
+		return
 	}
 	tokenID, err := auth.ExtractTokenID(r)
 	if err != nil {

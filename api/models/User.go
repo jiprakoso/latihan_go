@@ -28,7 +28,7 @@ func Hash(password string) ([]byte, error) {
 }
 
 // VerifiPassword fungsi untuk mengkomapare password dengan hash dengan password
-func VerifiPassword(hashedPassword, password string) error {
+func VerifyPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
@@ -36,7 +36,7 @@ func VerifiPassword(hashedPassword, password string) error {
 func (u *User) BeforeSave() error {
 	hashedPassword, err := Hash(u.Password)
 	if err != nil {
-		return nil
+		return err
 	}
 	u.Password = string(hashedPassword)
 	return nil
@@ -62,7 +62,7 @@ func (u *User) Validate(action string) error {
 			return errors.New("Required Password")
 		}
 		if u.Email == "" {
-			return errors.New("Requeired Email")
+			return errors.New("Required Email")
 		}
 		if err := checkmail.ValidateFormat(u.Email); err != nil {
 			return errors.New("Invalid Email")
@@ -109,7 +109,7 @@ func (u *User) SaveUser(db *gorm.DB) (*User, error) {
 }
 
 // FindAllUser public method cari data user
-func (u *User) FindAllUser(db *gorm.DB) (*[]User, error) {
+func (u *User) FindAllUsers(db *gorm.DB) (*[]User, error) {
 	var err error
 	users := []User{}
 	err = db.Debug().Model(&User{}).Limit(100).Find(&users).Error
@@ -122,7 +122,7 @@ func (u *User) FindAllUser(db *gorm.DB) (*[]User, error) {
 // FindUserByID public method, cari user berdasarkan ID
 func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
 	var err error
-	err = db.Debug().Model(User{}).Where("Id = ?", uid).Take(&u).Error
+	err = db.Debug().Model(User{}).Where("id = ?", uid).Take(&u).Error
 	if err != nil {
 		return &User{}, err
 	}
