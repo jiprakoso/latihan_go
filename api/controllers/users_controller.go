@@ -46,7 +46,7 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 //GetUsers public method, controller untuk mendapatkan semua data user dari database
-func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
+func (server *Server) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	user := models.User{}
 	users, err := user.FindAllUser(server.DB)
 	if err != nil {

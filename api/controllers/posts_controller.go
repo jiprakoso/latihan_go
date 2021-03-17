@@ -54,7 +54,7 @@ func (server *Server) CreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 // GetPosts public method GET ALL POST, post controller
-func (server *Server) GetPosts(w http.ResponseWriter, r *http.Request) {
+func (server *Server) GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	post := models.Post{}
 
 	posts, err := post.FindAllPosts(server.DB)

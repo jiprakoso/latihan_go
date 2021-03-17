@@ -11,14 +11,14 @@ func (s *Server) initializeRoutes() {
 
 	//User Route
 	s.Router.HandleFunc("/users", middlewares.SetmiddlewareJSON(s.CreateUser)).Methods("POST")
-	s.Router.HandleFunc("/users", middlewares.SetmiddlewareJSON(s.GetUsers)).Methods("GET")
+	s.Router.HandleFunc("/users", middlewares.SetmiddlewareJSON(s.GetAllUsers)).Methods("GET")
 	s.Router.HandleFunc("/users/{id}", middlewares.SetmiddlewareJSON(s.GetUser)).Methods("GET")
 	s.Router.HandleFunc("/users/{id}", middlewares.SetmiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.UpdateUser))).Methods("GET")
 	s.Router.HandleFunc("/users/{id}", middlewares.SetMiddlewareAuthentication(s.DeletePost)).Methods("DELETE")
 
 	//Posts routes
 	s.Router.HandleFunc("/posts", middlewares.SetmiddlewareJSON(s.CreatePost)).Methods("POST")
-	s.Router.HandleFunc("/posts", middlewares.SetmiddlewareJSON(s.GetPosts)).Methods("GET")
+	s.Router.HandleFunc("/posts", middlewares.SetmiddlewareJSON(s.GetAllPosts)).Methods("GET")
 	s.Router.HandleFunc("/posts/{id}", middlewares.SetmiddlewareJSON(s.GetPost)).Methods("GET")
 	s.Router.HandleFunc("/posts/{id}", middlewares.SetmiddlewareJSON(middlewares.SetMiddlewareAuthentication(s.UpdatePost))).Methods("PUT")
 	s.Router.HandleFunc("/posts/{id}", middlewares.SetMiddlewareAuthentication(s.DeletePost)).Methods("DELETE")
