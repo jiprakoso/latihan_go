@@ -161,7 +161,7 @@ func (u *User) UpdateAUser(db *gorm.DB, uid uint32) (*User, error) {
 	return u, nil
 }
 
-// DeleteAUser public method untuk hapus user
+// DeleteAUser public method, model untuk hapus user
 func (u *User) DeleteAUser(db *gorm.DB, uid uint32) (int64, error) {
 	db = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&User{}).Delete(&User{})
 	if db.Error != nil {
